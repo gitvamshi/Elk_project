@@ -3,6 +3,8 @@ package com.vzw.customerservice.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,45 +20,49 @@ import reactor.core.publisher.Mono;
 @Service
 public class CustomerService {
 
-	@Autowired
-	private CustomerRepository repository;
+  @Autowired
+  private CustomerRepository repository;
 
-	@Autowired
-	private AddressRepository addressRepository;
+  @Autowired
+  private AddressRepository addressRepository;
 
-	public Flux<Customer> fetchAllCustomers() {
+  private static final Logger LOGGER = LoggerFactory.getLogger(CustomerService.class);
 
-		List<Customer> customers = repository.findAll();
-		return Flux.fromIterable(customers);
-	}
+  public Flux<Customer> fetchAllCustomers() {
 
-	public List<Customer> fetchAllCx() {
-		return repository.findAll();
-	}
+    List<Customer> customers = repository.findAll();
+    return Flux.fromIterable(customers);
+  }
 
-	public Mono<VZWCustomer> fetchCustomer(Long customerId) {
-		Optional<Customer> findById = repository.findById(customerId);
-		List<Address> findByCustomerId = addressRepository.findByCustomerId(customerId);
-		VZWCustomer vzwCustomer = null;
-		if(findById.isPresent()) {
-			vzwCustomer = new VZWCustomer();
-			vzwCustomer.setId(findById.get().getId());
-			vzwCustomer.setFirstName(findById.get().getFirstName());
-			vzwCustomer.setLastName(findById.get().getLastName());
-			vzwCustomer.setAddress(findByCustomerId);
-		}
-		return Mono.justOrEmpty(vzwCustomer);
-	}
+  public List<Customer> fetchAllCx() {
+    return repository.findAll();
+  }
 
-	public Mono<String> addCustomer(VZWCustomer customer) {
-		List<Address> address = customer.getAddress();
-		Customer customer2 = new Customer();
-		customer2.setId(customer.getId());
-		customer2.setFirstName(customer.getFirstName());
-		customer2.setLastName(customer.getLastName());
-		Customer save = repository.save(customer2);
-		address.get(0).setCustomer(save);
-		addressRepository.save(address.get(0));
-		return Mono.just("Successfully added customer! Id="+save.getId());
-	}
+  public Mono<VZWCustomer> fetchCustomer(Long customerId) {
+    LOGGER.info("Fetching Customer details for customerId: {}", customerId);
+
+    Optional<Customer> findById = repository.findById(customerId);
+    List<Address> findByCustomerId = addressRepository.findByCustomerId(customerId);
+    VZWCustomer vzwCustomer = null;
+    if(findById.isPresent()) {
+      vzwCustomer = new VZWCustomer();
+      vzwCustomer.setId(findById.get().getId());
+      vzwCustomer.setFirstName(findById.get().getFirstName());
+      vzwCustomer.setLastName(findById.get().getLastName());
+      vzwCustomer.setAddress(findByCustomerId);
+    }
+    return Mono.justOrEmpty(vzwCustomer);
+  }
+
+  public Mono<String> addCustomer(VZWCustomer customer) {
+    List<Address> address = customer.getAddress();
+    Customer customer2 = new Customer();
+    customer2.setId(customer.getId());
+    customer2.setFirstName(customer.getFirstName());
+    customer2.setLastName(customer.getLastName());
+    Customer save = repository.save(customer2);
+    address.get(0).setCustomer(save);
+    addressRepository.save(address.get(0));
+    return Mono.just("Successfully added customer! Id="+save.getId());
+  }
 }
