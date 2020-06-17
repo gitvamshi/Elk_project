@@ -19,32 +19,32 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/api/v1/equipment")
 public class EquipmentController {
-	
+
 	@Autowired
 	private EquipmentService equipmentService;
-	
-	@GetMapping("/getAllEquiments")
+
+	@GetMapping("/getAllEquipments")
 	public Flux<Equipment> getEquipments() {
 		return equipmentService.fetchAllEquipments();
 	}
-	
+
 	@GetMapping(path="/{id}",produces = "application/json")
 	public Mono<Equipment> getEquipmentBasedOnId(@PathVariable(name = "id") Long equipmentId) {
-		
+
 		return equipmentService.fetchEquipmentById(equipmentId);
 	}
-	
+
 	@GetMapping(path="/customer/{customer_id}",produces = "application/json")
 	public Mono<List<Equipment>> getEqipmentBasedOnCustomerId(@PathVariable(name = "customer_id") Long equipmentId) {
-		
+
 		return equipmentService.fetchEquipmentByCustomerId(equipmentId);
 	}
-	
+
 	@PostMapping("/addEquipment")
 	public Mono<String> addCustomer(@RequestBody Equipment equipment) {
 		return equipmentService.addEquipment(equipment);
 	}
-	
+
 //	@PostMapping("/map")
 //	public Mono<String> addCustomer(@RequestBody CustomerEquipment equipment) {
 //		return equipmentService.mapEquipment(equipment);

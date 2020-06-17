@@ -2,6 +2,8 @@ package com.vzw.equipmentservice.service;
 
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,8 @@ public class EquipmentService {
 	@Autowired
 	private EquipmentRepository repository;
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(EquipmentService.class);
+
 	// to get all the equipments
 	public Flux<Equipment> fetchAllEquipments() {
 		List<Equipment> findAll = repository.findAll();
@@ -29,7 +33,7 @@ public class EquipmentService {
 		Optional<Equipment> findById = repository.findById(equipmentId);
 		return Mono.justOrEmpty(findById);
 	}
-	
+
 	// to get equipment based on customerId
 	public Mono<List<Equipment>> fetchEquipmentByCustomerId(Long customerId) {
 		List<Equipment> equipments = repository.findByCustomerId(customerId);
@@ -44,7 +48,7 @@ public class EquipmentService {
 		}
 		return Mono.just("Equipment saved successfully with id="+equipment.getId());
 	}
-	
+
 	// to update equipment based on id
 	public Mono<String> updateEquipment(Equipment equipment) {
 		return Mono.just("Equipment updated successfully for id="+equipment.getId());
